@@ -31,5 +31,10 @@ func main() {
 
 	// Migrate the schema
 	db.AutoMigrate(&Geom{})
+
+
+	g := Geom{Point: morgorb.NewPoint(1, 2), Name: "test"}
+
+	db.Create(&g)
 }
 

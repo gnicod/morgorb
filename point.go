@@ -13,6 +13,12 @@ type Point struct {
 	orb orb.Point
 }
 
+func NewPoint(x float64, y float64) Point {
+	return Point{
+		orb: orb.Point{x, y},
+	}
+}
+
 func (p *Point) Scan(value interface{}) error {
 	bytes, _ := value.([]byte)
 	g, err := wkb.Unmarshal(bytes)
@@ -24,7 +30,7 @@ func (p *Point) Scan(value interface{}) error {
 }
 
 func (p Point) Value() (driver.Value, error) {
-	return p.orb, nil
+	return fmt.Sprintf("POINT(%v %v)", p.orb.Lat(), p.orb.Lon()), nil
 }
 func (Point) GormDBDataType(db *gorm.DB, field *schema.Field) string {
 	switch db.Dialector.Name() {
