@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/gnicod/morgorb"
+	"github.com/gnicod/georm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -11,7 +11,7 @@ import (
 type Geom struct {
 	gorm.Model
 	Name  string
-	Point morgorb.Point `gorm:"srid:4326"`
+	Point georm.Point `gorm:"srid:4326"`
 }
 
 func main() {
@@ -32,7 +32,7 @@ func main() {
 	db.AutoMigrate(&Geom{})
 
 	// insert a point
-	point , err := morgorb.NewPoint(50, 23)
+	point , err := georm.NewPoint(50, 23)
 	if err != nil {
 		panic(err)
 	}

@@ -1,4 +1,4 @@
-module github.com/gnicod/morgorb
+module github.com/gnicod/georm
 
 go 1.17
 

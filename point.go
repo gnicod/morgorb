@@ -1,4 +1,4 @@
-package morgorb
+package georm
 
 import (
 	"database/sql/driver"
