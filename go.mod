@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/jinzhu/gorm v1.9.16
-	github.com/paulmach/orb v0.2.2
+	github.com/twpayne/go-geom v1.4.1
 	gorm.io/driver/postgres v1.1.1
 	gorm.io/gorm v1.21.15
 )

@@ -1,2 +1,2 @@
-# morgorb
-use orb with gorm
+# georm
+use geometry with gorm

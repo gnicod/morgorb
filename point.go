@@ -2,36 +2,62 @@ package morgorb
 
 import (
 	"database/sql/driver"
+	"encoding/hex"
+	"errors"
 	"fmt"
-	"github.com/paulmach/orb"
-	"github.com/paulmach/orb/encoding/wkb"
+	"github.com/twpayne/go-geom"
+	"github.com/twpayne/go-geom/encoding/ewkb"
+	"github.com/twpayne/go-geom/encoding/geojson"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
 )
 
 type Point struct {
-	orb orb.Point
+	geom *geom.Point
 }
 
-func NewPoint(x float64, y float64) Point {
-	return Point{
-		orb: orb.Point{x, y},
+func (p Point) ToGeoJson() (string, error) {
+	geometry, err := geojson.Marshal(p.geom)
+	return string(geometry), err
+}
+
+func NewPoint(coordinates ...float64) (Point, error) {
+	switch len(coordinates) {
+	case 2:
+		return Point{
+			geom: geom.NewPointFlat(geom.XY, []float64{coordinates[0], coordinates[1]}),
+		}, nil
+	case 3:
+		return Point{
+			geom: geom.NewPointFlat(geom.XYZ , []float64{coordinates[0], coordinates[1], coordinates[2]}),
+		}, nil
+	default:
+		return Point{}, errors.New("point must have 2 or 3 coordinates")
 	}
 }
 
 func (p *Point) Scan(value interface{}) error {
-	bytes, _ := value.([]byte)
-	g, err := wkb.Unmarshal(bytes)
+	data, err := hex.DecodeString(value.(string))
 	if err != nil {
-		return err
+		return nil
 	}
-	p.orb = g.(orb.Point)
+
+	point, err := ewkb.Unmarshal(data)
+	p.geom = point.(*geom.Point)
 	return err
 }
 
 func (p Point) Value() (driver.Value, error) {
-	return fmt.Sprintf("POINT(%v %v)", p.orb.Lat(), p.orb.Lon()), nil
+		switch p.geom.Layout() {
+		case geom.XY:
+			return fmt.Sprintf("POINT(%v %v)", p.geom.X(), p.geom.Y()), nil
+		case geom.XYZ:
+			return fmt.Sprintf("POINT(%v %v %v)", p.geom.X(), p.geom.Y(), p.geom.Z()), nil
+		default:
+			return "", errors.New(fmt.Sprintf("layout %s not implemented", p.geom.Layout()))
+		}
 }
+
 func (Point) GormDBDataType(db *gorm.DB, field *schema.Field) string {
 	switch db.Dialector.Name() {
 	case "mysql", "sqlite":
