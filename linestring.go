@@ -55,15 +55,20 @@ func (p *LineString) Scan(value interface{}) error {
 }
 
 func (p LineString) Value() (driver.Value, error) {
-		// TODO LINESTRING(0 0, 1 1, 2 1, 2 2)
-		switch p.geom.Layout() {
-		case geom.XY:
-			return fmt.Sprintf("LINESTRING(%v %v)", p.geom.X(), p.geom.Y()), nil
-		case geom.XYZ:
-			return fmt.Sprintf("LINESTRING(%v %v %v)", p.geom.X(), p.geom.Y(), p.geom.Z()), nil
-		default:
-			return "", errors.New(fmt.Sprintf("layout %s not implemented", p.geom.Layout()))
+	strLineString := ""
+	switch p.geom.Layout() {
+	case geom.XY:
+		for _, coord := range p.geom.Coords() {
+			strLineString += fmt.Sprintf("%v %v", coord[0], coord[1])
 		}
+	case geom.XYZ:
+		for _, coord := range p.geom.Coords() {
+			strLineString += fmt.Sprintf("%v %v %v", coord[0], coord[1], coord[2])
+		}
+	default:
+		return "", errors.New(fmt.Sprintf("layout %s not implemented", p.geom.Layout()))
+	}
+	return fmt.Sprintf("LINESTRING(%v)", strLineString), nil
 }
 
 func (LineString) GormDBDataType(db *gorm.DB, field *schema.Field) string {
