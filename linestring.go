@@ -10,6 +10,7 @@ import (
 	"github.com/twpayne/go-geom/encoding/geojson"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
+	"strings"
 )
 
 type LineString struct {
@@ -22,7 +23,11 @@ func (p LineString) ToGeoJson() (string, error) {
 }
 
 func flatten(m [][]float64) []float64 {
-	return m[0][:cap(m[0])]
+	res := []float64{}
+	for i := range m {
+		res = append(res, m[i]...)
+	}
+	return res
 }
 
 func NewLineString(coordinates ...[]float64) (LineString, error) {
@@ -59,15 +64,16 @@ func (p LineString) Value() (driver.Value, error) {
 	switch p.geom.Layout() {
 	case geom.XY:
 		for _, coord := range p.geom.Coords() {
-			strLineString += fmt.Sprintf("%v %v", coord[0], coord[1])
+			strLineString += fmt.Sprintf("%v %v,", coord[0], coord[1])
 		}
 	case geom.XYZ:
 		for _, coord := range p.geom.Coords() {
-			strLineString += fmt.Sprintf("%v %v %v", coord[0], coord[1], coord[2])
+			strLineString += fmt.Sprintf("%v %v %v,", coord[0], coord[1], coord[2])
 		}
 	default:
 		return "", errors.New(fmt.Sprintf("layout %s not implemented", p.geom.Layout()))
 	}
+	strLineString = strings.TrimSuffix(strLineString, ",")
 	return fmt.Sprintf("LINESTRING(%v)", strLineString), nil
 }
 
