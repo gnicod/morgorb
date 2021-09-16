@@ -21,17 +21,22 @@ func (p LineString) ToGeoJson() (string, error) {
 	return string(geometry), err
 }
 
-func NewLineString(coordinates ...float64) (LineString, error) {
-	switch len(coordinates) {
+func flatten(m [][]float64) []float64 {
+	return m[0][:cap(m[0])]
+}
+
+func NewLineString(coordinates ...[]float64) (LineString, error) {
+	flattenCoordinate := flatten(coordinates)
+	switch len(coordinates[0]) {
 	case 2:
 		return LineString{
 			// TODO iterate
-			geom: geom.NewLineStringFlat(geom.XY, []float64{coordinates[0], coordinates[1]} ,[]int{10}), //.SetSRID(4326),
+			geom: geom.NewLineStringFlat(geom.XY, flattenCoordinate), //.SetSRID(4326),
 		}, nil
 	case 3:
 		return LineString{
 			// TODO iterate
-			geom: geom.NewLineStringFlat(geom.XYZ , []float64{coordinates[0], coordinates[1], coordinates[2]}, []int{10}),
+			geom: geom.NewLineStringFlat(geom.XYZ , flattenCoordinate),
 		}, nil
 	default:
 		return LineString{}, errors.New("point must have 2 or 3 coordinates")
