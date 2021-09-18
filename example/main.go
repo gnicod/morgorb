@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"github.com/gnicod/georm"
-	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -45,16 +44,17 @@ func main() {
 	g := Geom{Point: point, Name: "test", LineString: linestring}
 	db.Create(&g)
 
-	var fetched Geom
-	db.First(&fetched, 23)
-	gjson, _ := fetched.Point.ToGeoJson()
-	print(gjson)
-	gjsonl, _ := fetched.LineString.ToGeoJson()
-	print(gjsonl)
-	tx := db.Raw("select st_asgeojson(line_string) from geoms;")
 
+	var fetched Geom
+	db.First(&fetched, g.ID)
+	gjson, _ := fetched.Point.ToGeoJson()
+	fmt.Println(gjson)
+	gjsonl, _ := fetched.LineString.ToGeoJson()
+	fmt.Println(gjsonl)
+
+	tx := db.Raw("select st_asgeojson(line_string) from geoms;")
 	var geojson string
 	tx.Scan(&geojson)
-	print(geojson)
+	fmt.Println(geojson)
 
 }
