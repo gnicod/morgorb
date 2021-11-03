@@ -50,9 +50,9 @@ func (p *Point) Scan(value interface{}) error {
 func (p Point) Value() (driver.Value, error) {
 		switch p.geom.Layout() {
 		case geom.XY:
-			return fmt.Sprintf("POINT(%v %v)", p.geom.X(), p.geom.Y()), nil
+			return fmt.Sprintf("SRID=4326;POINT(%v %v)", p.geom.X(), p.geom.Y()), nil
 		case geom.XYZ:
-			return fmt.Sprintf("POINT(%v %v %v)", p.geom.X(), p.geom.Y(), p.geom.Z()), nil
+			return fmt.Sprintf("SRID=4326;POINT(%v %v %v)", p.geom.X(), p.geom.Y(), p.geom.Z()), nil
 		default:
 			return "", errors.New(fmt.Sprintf("layout %s not implemented", p.geom.Layout()))
 		}
