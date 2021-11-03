@@ -74,7 +74,7 @@ func (p LineString) Value() (driver.Value, error) {
 		return "", errors.New(fmt.Sprintf("layout %s not implemented", p.geom.Layout()))
 	}
 	strLineString = strings.TrimSuffix(strLineString, ",")
-	return fmt.Sprintf("LINESTRING(%v)", strLineString), nil
+	return fmt.Sprintf("SRID=4326;LINESTRING(%v)", strLineString), nil
 }
 
 func (LineString) GormDBDataType(db *gorm.DB, field *schema.Field) string {
