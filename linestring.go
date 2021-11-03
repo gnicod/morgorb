@@ -36,7 +36,7 @@ func NewLineString(coordinates ...[]float64) (LineString, error) {
 	case 2:
 		return LineString{
 			// TODO iterate
-			geom: geom.NewLineStringFlat(geom.XY, flattenCoordinate), //.SetSRID(4326),
+			geom: geom.NewLineStringFlat(geom.XY, flattenCoordinate).SetSRID(4326), # TODO SRID should be configurable
 		}, nil
 	case 3:
 		return LineString{
