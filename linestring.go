@@ -22,6 +22,10 @@ func (p LineString) ToGeoJson() (string, error) {
 	return string(geometry), err
 }
 
+func (p *LineString) ToLineString() *geom.LineString {
+	return p.geom
+}
+
 func flatten(m [][]float64) []float64 {
 	res := []float64{}
 	for i := range m {

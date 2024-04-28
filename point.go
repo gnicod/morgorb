@@ -27,6 +27,10 @@ func NewGeormPoint(point geom.Point) Point {
 	}
 }
 
+func (p Point) ToPoint() *geom.Point {
+	return p.geom
+}
+
 func NewPoint(coordinates ...float64) (Point, error) {
 	switch len(coordinates) {
 	case 2:
