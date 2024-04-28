@@ -30,6 +30,12 @@ func flatten(m [][]float64) []float64 {
 	return res
 }
 
+func NewGeormLineString(lineString geom.LineString) LineString {
+	return LineString{
+		geom: &lineString,
+	}
+}
+
 func NewLineString(coordinates ...[]float64) (LineString, error) {
 	flattenCoordinate := flatten(coordinates)
 	switch len(coordinates[0]) {
@@ -41,7 +47,7 @@ func NewLineString(coordinates ...[]float64) (LineString, error) {
 	case 3:
 		return LineString{
 			// TODO iterate
-			geom: geom.NewLineStringFlat(geom.XYZ , flattenCoordinate),
+			geom: geom.NewLineStringFlat(geom.XYZ, flattenCoordinate),
 		}, nil
 	default:
 		return LineString{}, errors.New("point must have 2 or 3 coordinates")
