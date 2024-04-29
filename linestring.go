@@ -3,13 +3,11 @@ package georm
 import (
 	"database/sql/driver"
 	"encoding/hex"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/twpayne/go-geom"
 	"github.com/twpayne/go-geom/encoding/ewkb"
 	"github.com/twpayne/go-geom/encoding/geojson"
-	"github.com/twpayne/go-polyline"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
 
@@ -26,17 +24,15 @@ func (p LineString) MarshalJSON() ([]byte, error) {
 }
 
 func (p *LineString) UnmarshalJSON(b []byte) error {
-	var value string
-	err := json.Unmarshal(b, &value)
-	if err != nil {
+	var geometry geom.T
+	if err := geojson.Unmarshal(b, &geometry); err != nil {
 		return err
 	}
-	coords, _, err := polyline.DecodeCoords([]byte(value))
-	if err != nil {
-		panic(err)
+	ls, ok := geometry.(*geom.LineString)
+	if !ok {
+		return errors.New("geometry is not a point")
 	}
-	var lineString, _ = NewLineString(coords...)
-	p = &lineString
+	p.geom = ls
 	return nil
 }
 
