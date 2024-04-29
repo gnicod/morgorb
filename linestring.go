@@ -3,18 +3,41 @@ package georm
 import (
 	"database/sql/driver"
 	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/twpayne/go-geom"
 	"github.com/twpayne/go-geom/encoding/ewkb"
 	"github.com/twpayne/go-geom/encoding/geojson"
+	"github.com/twpayne/go-polyline"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
+
 	"strings"
 )
 
 type LineString struct {
 	geom *geom.LineString
+}
+
+func (p LineString) MarshalJSON() ([]byte, error) {
+	geojson, _ := p.ToGeoJson()
+	return []byte(geojson), nil
+}
+
+func (p *LineString) UnmarshalJSON(b []byte) error {
+	var value string
+	err := json.Unmarshal(b, &value)
+	if err != nil {
+		return err
+	}
+	coords, _, err := polyline.DecodeCoords([]byte(value))
+	if err != nil {
+		panic(err)
+	}
+	var lineString, _ = NewLineString(coords...)
+	p = &lineString
+	return nil
 }
 
 func (p LineString) ToGeoJson() (string, error) {
