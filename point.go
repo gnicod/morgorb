@@ -60,9 +60,9 @@ func (p *Point) Scan(value interface{}) error {
 func (p Point) Value() (driver.Value, error) {
 	switch p.geom.Layout() {
 	case geom.XY:
-		return fmt.Sprintf("SRID=4326;POINT(%v %v)", p.geom.X(), p.geom.Y()), nil
+		return fmt.Sprintf("SRID=3857;POINT(%v %v)", p.geom.X(), p.geom.Y()), nil
 	case geom.XYZ:
-		return fmt.Sprintf("SRID=4326;POINT(%v %v %v)", p.geom.X(), p.geom.Y(), p.geom.Z()), nil
+		return fmt.Sprintf("SRID=3857;POINT(%v %v %v)", p.geom.X(), p.geom.Y(), p.geom.Z()), nil
 	default:
 		return "", errors.New(fmt.Sprintf("layout %s not implemented", p.geom.Layout()))
 	}
@@ -76,7 +76,7 @@ func (Point) GormDBDataType(db *gorm.DB, field *schema.Field) string {
 	case "postgres":
 		srid, exists := field.TagSettings["SRID"]
 		if !exists {
-			srid = "4326"
+			srid = "3857"
 		}
 		return fmt.Sprintf("geometry(Point, %s)", srid)
 	}
@@ -84,5 +84,5 @@ func (Point) GormDBDataType(db *gorm.DB, field *schema.Field) string {
 }
 
 func (Point) GormDataType() string {
-	return "geometry(Point, 4326)"
+	return "geometry(Point, 3857)"
 }
